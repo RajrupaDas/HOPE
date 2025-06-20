@@ -1,4 +1,4 @@
-# HOPEX: Hybrid Orbit Prediction Engine with Explainability
+# HOPE: Hybrid Orbit Prediction Engine (with plans for Explainability) 
 
 **Project Type:** Hybrid orbit prediction system combining classical astrodynamics and machine learning  
 **Author:** Rajrupa Das  
