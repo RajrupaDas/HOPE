@@ -8,7 +8,7 @@
 
 ## Overview
 
-HOPEX is a hybrid orbit prediction system designed to simulate and forecast the motion of Low Earth Orbit (LEO) satellites under perturbative forces, beginning with the J2 zonal harmonic effect. This project combines traditional orbital propagation with data-driven forecasting approaches, with a focus on maintaining physical fidelity while reducing computational load.
+HOPE is a hybrid orbit prediction system designed to simulate and forecast the motion of Low Earth Orbit (LEO) satellites under perturbative forces, beginning with the J2 zonal harmonic effect. This project combines traditional orbital propagation with data-driven forecasting approaches, with a focus on maintaining physical fidelity while reducing computational load.
 
 The long-term aim is to evaluate the effectiveness of machine learning models in approximating orbital dynamics and explore techniques to interpret their internal behavior.
 
