@@ -2,46 +2,77 @@ from astropy import units as u
 from astropy.time import Time
 from poliastro.bodies import Earth
 from poliastro.twobody import Orbit
-from poliastro.twobody.propagation import propagate
+from poliastro.core.perturbations import J2_perturbation
+from scipy.integrate import solve_ivp
 import numpy as np
 import pandas as pd
 
 # -----------------------------
-# Initial Orbit - LEO Example
+# Initial orbit setup
 # -----------------------------
 epoch = Time("2025-01-01 00:00:00", scale="utc")
-a = 7000 * u.km  # ~400km above Earth's surface
+a = 7000 * u.km
 ecc = 0.001 * u.one
 inc = 51.6 * u.deg
 raan = 0 * u.deg
 argp = 0 * u.deg
 nu = 0 * u.deg
 
+# Create orbit
 orbit = Orbit.from_classical(Earth, a, ecc, inc, raan, argp, nu, epoch)
 
 # -----------------------------
-# Time samples (simulate 2 orbits)
+# Constants
 # -----------------------------
-period = orbit.period.to(u.s).value
-num_points = 1000
-times = np.linspace(0, 2 * period, num_points) * u.s
+mu_earth = Earth.k.to(u.km**3 / u.s**2).value
+J2 = Earth.J2.value
+R = Earth.R.to(u.km).value
 
 # -----------------------------
-# Propagate and record position/velocity
+# Derivative function (includes J2)
 # -----------------------------
-data = []
-for t in times:
-    propagated = orbit.propagate(t)
-    r = propagated.r.to(u.km).value
-    v = propagated.v.to(u.km / u.s).value
-    data.append([t.to(u.s).value, *r, *v])
+def two_body_j2(t, state_vec):
+    r = state_vec[:3]
+    v = state_vec[3:]
+
+    # Acceleration = gravity + J2
+    acc = -mu_earth * r / np.linalg.norm(r)**3
+    acc += J2_perturbation(t, state_vec, k=mu_earth, J2=J2, R=R)
+
+    return np.concatenate((v, acc))
 
 # -----------------------------
-# Export to CSV
+# Initial state vector (r, v)
 # -----------------------------
-df = pd.DataFrame(data, columns=[
-    "time (s)", "x (km)", "y (km)", "z (km)", "vx (km/s)", "vy (km/s)", "vz (km/s)"
-])
-df.to_csv("leo_orbit_basic.csv", index=False)
-print("Basic LEO orbit CSV saved: leo_orbit_basic.csv")
+initial_state = np.concatenate((
+    orbit.r.to_value(u.km),
+    orbit.v.to_value(u.km / u.s)
+))
+
+# -----------------------------
+# Time span
+# -----------------------------
+period_sec = orbit.period.to_value(u.s)
+t_eval = np.linspace(0, 2 * period_sec, 1000)  # simulate 2 orbits
+
+# -----------------------------
+# Solve the equations of motion
+# -----------------------------
+sol = solve_ivp(two_body_j2, (0, t_eval[-1]), initial_state, t_eval=t_eval, rtol=1e-10)
+
+# -----------------------------
+# Extract data to DataFrame
+# -----------------------------
+df = pd.DataFrame({
+    "time (s)": sol.t,
+    "x (km)": sol.y[0],
+    "y (km)": sol.y[1],
+    "z (km)": sol.y[2],
+    "vx (km/s)": sol.y[3],
+    "vy (km/s)": sol.y[4],
+    "vz (km/s)": sol.y[5],
+})
+
+df.to_csv("leo_orbit_with_j2_FIXED.csv", index=False)
+print("CSV saved: leo_orbit_with_j2_FIXED.csv")
 
