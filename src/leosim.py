@@ -73,6 +73,6 @@ df = pd.DataFrame({
     "vz (km/s)": sol.y[5],
 })
 
-df.to_csv("leo_orbit_with_j2_FIXED.csv", index=False)
+df.to_csv("data/leo_orbit_with_j2_FIXED.csv", index=False)
 print("CSV saved: leo_orbit_with_j2_FIXED.csv")
 
