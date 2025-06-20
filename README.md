@@ -1,8 +1,7 @@
 # HOPEX: Hybrid Orbit Prediction Engine with Explainability
 
 **Project Type:** Hybrid orbit prediction system combining classical astrodynamics and machine learning  
-**Author:** [Your Name]  
-**License:** MIT  
+**Author:** Rajrupa Das  
 **Status:** Simulation and dataset generation complete; machine learning module in progress
 
 ---
