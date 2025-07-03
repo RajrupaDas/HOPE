@@ -30,3 +30,13 @@ history = model.fit(X_train, y_train, validation_split=0.2, epochs=50, batch_siz
 # Save the model
 model.save("../models/lstm_orbit_predictor.keras")
 
+# Evaluate
+loss = model.evaluate(X_test, y_test)
+print(f"Test MSE: {loss}")
+
+# Predict
+predictions = model.predict(X_test)
+
+# Save predictions to file
+np.save("../data/lstm_predictions.npy", predictions)
+
