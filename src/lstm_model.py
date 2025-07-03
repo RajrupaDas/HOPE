@@ -24,3 +24,9 @@ model = Sequential([
 model.compile(optimizer=Adam(learning_rate=0.001), loss='mse')
 model.summary()
 
+# Train the model
+history = model.fit(X_train, y_train, validation_split=0.2, epochs=50, batch_size=32)
+
+# Save the model
+model.save("../models/lstm_orbit_predictor.keras")
+
