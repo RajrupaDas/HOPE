@@ -8,10 +8,15 @@ from pathlib import Path
 # -----------------------------
 # Load Data
 # -----------------------------
-X_train = np.load("../data/X_train.npy")
-y_train = np.load("../data/y_train.npy")
-X_test = np.load("../data/X_test.npy")
-y_test = np.load("../data/y_test.npy")
+# Absolute-safe path setup
+this_dir = Path(__file__).resolve().parent
+data_dir = this_dir.parent / "data"
+
+# Load data from correct location
+X_train = np.load(data_dir / "X_train.npy")
+y_train = np.load(data_dir / "y_train.npy")
+X_test  = np.load(data_dir / "X_test.npy")
+y_test  = np.load(data_dir / "y_test.npy")
 
 # -----------------------------
 # Define LSTM Model
@@ -58,6 +63,7 @@ print(f"Test MSE: {loss:.6f}, MAE: {mae:.6f}")
 # Predict and Save
 # -----------------------------
 predictions = model.predict(X_test)
-np.save("../data/lstm_predictions.npy", predictions)
+predictions_path = data_dir / "lstm_predictions.npy"
+np.save(predictions_path, predictions)
 print("Predictions saved to data/lstm_predictions.npy")
 

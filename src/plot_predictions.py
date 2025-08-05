@@ -1,35 +1,33 @@
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Load data
-y_test = np.load("../data/y_test.npy")
-preds = np.load("../data/lstm_predictions.npy")
-
-# Plot x-coordinate prediction
-plt.plot(y_test[:, 0], label="True x")
-plt.plot(preds[:, 0], label="Predicted x")
-plt.legend()
-plt.title("LSTM Prediction vs Ground Truth (X coordinate)")
-plt.xlabel("Time steps")
-plt.ylabel("Normalized X")
-plt.grid()
-plt.savefig("../plots/lstm_vs_truth_x.png")
-import numpy as np
-import matplotlib.pyplot as plt
 from pathlib import Path
+import numpy as np
+import matplotlib.pyplot as plt
 
 # -----------------------------
-# Load Predictions and Truth
+# Absolute path setup
 # -----------------------------
-y_test = np.load("../data/y_test.npy")
-preds = np.load("../data/lstm_predictions.npy")
+this_dir = Path(__file__).resolve().parent
+data_dir = this_dir.parent / "data"
+results_dir = this_dir.parent / "results"
+
+# Ensure results directory exists
+results_dir.mkdir(parents=True, exist_ok=True)
 
 # -----------------------------
-# Plot Prediction vs Ground Truth for x/y/z
+# Load Data
+# -----------------------------
+y_test_path = data_dir / "y_test.npy"
+preds_path = data_dir / "lstm_predictions.npy"
+
+assert y_test_path.exists(), f"Missing file: {y_test_path}"
+assert preds_path.exists(), f"Missing file: {preds_path}"
+
+y_test = np.load(y_test_path)
+preds = np.load(preds_path)
+
+# -----------------------------
+# Plotting
 # -----------------------------
 labels = ['X', 'Y', 'Z']
-save_dir = Path("../results")
-save_dir.mkdir(parents=True, exist_ok=True)
 
 for i in range(3):
     plt.figure(figsize=(10, 4))
@@ -41,8 +39,11 @@ for i in range(3):
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(save_dir / f"lstm_vs_truth_{labels[i].lower()}.png")
+
+    save_path = results_dir / f"lstm_vs_truth_{labels[i].lower()}.png"
+    print(f"Saving plot to: {save_path}")
+    plt.savefig(save_path)
     plt.close()
 
-print("Saved plots in /results")
+print("✅ All plots saved to /results")
 
