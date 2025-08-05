@@ -17,17 +17,15 @@ HOPE is a hybrid orbit prediction engine that simulates and forecasts the motion
 Classical numerical propagators (e.g., RK4) provide accurate orbital predictions but are often computationally intensive, especially for long-duration or multi-object simulations. In contrast, machine learning offers a faster alternative but lacks inherent physical interpretability. This project explores a middle ground by using classical propagation to generate training data for ML models, aiming to create a hybrid system that is both efficient and physically grounded.
 
 ---
-
 ## Features and Progress
 
 | Step      | Description                                                             | Status       |
 |-----------|-------------------------------------------------------------------------|--------------|
 | Step 1    | Orbit simulation using Poliastro with J2 perturbation                  | Completed    |
 | Step 2    | Time-series dataset preparation for ML (sliding window, normalization) | Completed    |
-| Step 3    | Build and train LSTM model to predict future orbital positions         | In Progress  |
-| Step 4    | Compare ML predictions with RK4 propagation (baseline)                 | Pending      |
+| Step 3    | Build and train LSTM model to predict future orbital positions         | Completed    |
+| Step 4    | Compare ML predictions with RK4 propagation (baseline)                 | In Progress  |
 | Step 5    | Evaluate hybrid model (average RK4 + LSTM) and visualize errors        | Pending      |
-
 ---
 
 ## Repository Structure
