@@ -1,49 +1,46 @@
-from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
+from joblib import load
 
-# -----------------------------
-# Absolute path setup
-# -----------------------------
-this_dir = Path(__file__).resolve().parent
-data_dir = this_dir.parent / "data"
-results_dir = this_dir.parent / "results"
+base_dir = Path(__file__).resolve().parent        
+project_root = base_dir.parent                    
+data_dir = project_root / "data"
+models_dir = project_root / "models"
+results_dir = project_root / "results"
 
-# Ensure results directory exists
 results_dir.mkdir(parents=True, exist_ok=True)
 
-# -----------------------------
-# Load Data
-# -----------------------------
-y_test_path = data_dir / "y_test.npy"
-preds_path = data_dir / "lstm_predictions.npy"
+y_test = np.load(data_dir / "y_test.npy")
+y_pred = np.load(data_dir / "lstm_predictions.npy")
+scaler = load(models_dir / "scaler.pkl")
 
-assert y_test_path.exists(), f"Missing file: {y_test_path}"
-assert preds_path.exists(), f"Missing file: {preds_path}"
+# Load the scaler used in preprocessing
+scaler = load("../models/scaler.pkl") # Inverse transform y_test & LSTM predictions to km
+y_test_km = scaler.inverse_transform(y_test)
+lstm_predictions_km = scaler.inverse_transform(lstm_predictions)
 
-y_test = np.load(y_test_path)
-preds = np.load(preds_path)
+# If rk4_positions in km already skip inverse transform
+# If in normalized units:
+# rk4_positions_km = scaler.inverse_transform(rk4_positions)
+rk4_positions_km = rk4_positions  # already in km
 
-# -----------------------------
-# Plotting
-# -----------------------------
-labels = ['X', 'Y', 'Z']
+labels = ["X", "Y", "Z", "Vx", "Vy", "Vz"]
 
-for i in range(3):
-    plt.figure(figsize=(10, 4))
-    plt.plot(y_test[:, i], label=f"True {labels[i]}")
-    plt.plot(preds[:, i], label=f"Predicted {labels[i]}", linestyle='dashed')
-    plt.title(f"LSTM Prediction vs Ground Truth ({labels[i]} coordinate)")
-    plt.xlabel("Time steps")
-    plt.ylabel("Normalized Position")
+# Plot comparisons for each variable#
+for i, label in enumerate(labels):
+    plt.figure(figsize=(8, 6))
+    plt.plot(y_test_km[:, i], label="True")
+    plt.plot(lstm_predictions_km[:, i], '--', label="LSTM")
+    plt.plot(rk4_positions_km[:, i], ':', label="RK4")
+    plt.title(f"Prediction Comparison: {label}")
+    plt.xlabel("Time step")
+    plt.ylabel(f"{label} {'Position (km)' if i < 3 else 'Velocity (km/s)'}")
     plt.legend()
     plt.grid(True)
-    plt.tight_layout()
-
-    save_path = results_dir / f"lstm_vs_truth_{labels[i].lower()}.png"
-    print(f"Saving plot to: {save_path}")
-    plt.savefig(save_path)
+    plt.savefig(results_dir / f"lstm_vs_truth_{labels[i].lower()}.png")
     plt.close()
 
-print("✅ All plots saved to /results")
+print(" Updated plots saved in:", results_dir)
+
 
